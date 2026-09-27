@@ -1,0 +1,61 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: light;
+  }
+  html {
+    @apply scroll-smooth;
+  }
+  body {
+    @apply bg-background text-text-primary antialiased;
+  }
+  ::selection {
+    @apply bg-accent/20;
+  }
+  *:focus-visible {
+    outline: 2px solid #A9793E;
+    outline-offset: 2px;
+  }
+}
+
+@layer components {
+  .container-page {
+    @apply mx-auto w-full max-w-8xl px-5 sm:px-8 lg:px-10;
+  }
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-md px-5 py-2.5 text-sm font-medium transition-colors duration-150 disabled:opacity-50 disabled:pointer-events-none;
+  }
+  .btn-primary {
+    @apply btn bg-primary text-primary-foreground hover:bg-primary-hover;
+  }
+  .btn-accent {
+    @apply btn bg-accent text-accent-foreground hover:bg-accent-hover;
+  }
+  .btn-outline {
+    @apply btn border border-border bg-transparent text-text-primary hover:bg-surface-muted;
+  }
+  .card {
+    @apply rounded-lg border border-border bg-surface shadow-card;
+  }
+  .input {
+    @apply w-full rounded-md border border-border bg-surface px-3.5 py-2.5 text-sm text-text-primary placeholder:text-text-secondary/70 focus:border-primary focus:outline-none;
+  }
+  .label {
+    @apply mb-1.5 block text-sm font-medium text-text-primary;
+  }
+  .badge {
+    @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
