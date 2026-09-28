@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useToast } from "@/components/ui/Toast";
 
 type Props = {
   serviceId?: string;
@@ -11,6 +12,7 @@ type Props = {
 };
 
 export function InquiryForm({ serviceId, subServiceId, listingId, contextLabel, sourcePage }: Props) {
+  const toast = useToast();
   const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
   const [error, setError] = useState<string | null>(null);
 
@@ -43,13 +45,16 @@ export function InquiryForm({ serviceId, subServiceId, listingId, contextLabel, 
       const data = await res.json();
       if (!res.ok) {
         setError(data?.error ?? "Something went wrong. Please try again.");
+        toast.error("Couldn't send your inquiry", data?.error ?? "Please try again.");
         setStatus("error");
         return;
       }
       setStatus("success");
+      toast.success("Inquiry sent", "Our team will contact you shortly.");
       (e.target as HTMLFormElement).reset();
     } catch {
       setError("Network error. Please check your connection and try again.");
+      toast.error("Network error", "Please check your connection and try again.");
       setStatus("error");
     }
   }

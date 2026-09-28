@@ -1,11 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useToast } from "@/components/ui/Toast";
 
-export default function AdminLoginPage() {
+function LoginForm() {
   const router = useRouter();
+  const toast = useToast();
   const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -26,8 +28,10 @@ export default function AdminLoginPage() {
     setLoading(false);
     if (res?.error) {
       setError("Invalid email or password.");
+      toast.error("Sign in failed", "Invalid email or password.");
       return;
     }
+    toast.success("Welcome back");
     router.push(searchParams.get("callbackUrl") || "/admin");
   }
 
@@ -70,5 +74,13 @@ export default function AdminLoginPage() {
         </form>
       </div>
     </div>
+  );
+}
+
+export default function AdminLoginPage() {
+  return (
+    <Suspense fallback={null}>
+      <LoginForm />
+    </Suspense>
   );
 }

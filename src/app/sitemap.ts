@@ -1,6 +1,8 @@
 import type { MetadataRoute } from "next";
 import { prisma } from "@/lib/prisma";
 
+export const dynamic = "force-dynamic";
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 
@@ -13,6 +15,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   return [
     { url: siteUrl, lastModified: new Date() },
     { url: `${siteUrl}/services`, lastModified: new Date() },
+    { url: `${siteUrl}/listings`, lastModified: new Date() },
     ...services.map((s) => ({ url: `${siteUrl}/services/${s.slug}`, lastModified: s.updatedAt })),
     ...subServices.map((s) => ({ url: `${siteUrl}/services/${s.service.slug}/${s.slug}`, lastModified: s.updatedAt })),
     ...listings.map((l) => ({ url: `${siteUrl}/services/${l.service.slug}/${l.subService.slug}/${l.slug}`, lastModified: l.updatedAt })),

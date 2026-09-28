@@ -58,11 +58,17 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
   }
 
   if ("assigneeId" in parsed.data) {
+    const assigneeUser = parsed.data.assigneeId
+      ? await prisma.user.findUnique({ where: { id: parsed.data.assigneeId }, select: { name: true, isActive: true } })
+      : null;
+    if (parsed.data.assigneeId && (!assigneeUser || !assigneeUser.isActive)) {
+      return NextResponse.json({ error: "That team member is not available." }, { status: 400 });
+    }
     const inquiry = await prisma.inquiry.update({
       where: { id: params.id },
       data: {
         assigneeId: parsed.data.assigneeId,
-        activities: { create: { type: "ASSIGNED", detail: parsed.data.assigneeId ?? "Unassigned", actorId: userId } },
+        activities: { create: { type: "ASSIGNED", detail: assigneeUser ? `Assigned to ${assigneeUser.name}` : "Unassigned", actorId: userId } },
       },
     });
     return NextResponse.json(inquiry);

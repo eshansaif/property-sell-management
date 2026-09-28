@@ -120,6 +120,13 @@ async function main() {
           { specificationId: specRoad.id, value: "25" },
         ],
       },
+      customSpecs: {
+        create: [
+          { group: "Legal & documents", label: "Ownership", value: "Freehold", sortOrder: 0 },
+          { group: "Legal & documents", label: "Mutation", value: "Completed", sortOrder: 1 },
+          { group: "Location advantages", label: "Nearby", value: "School, hospital, main road", sortOrder: 2 },
+        ],
+      },
     },
   });
 
@@ -170,6 +177,19 @@ async function main() {
     create: { subServiceId: familyApt.id, name: "Furnished", key: "furnished", type: SpecFieldType.BOOLEAN, displayOrder: 4 },
   });
 
+  const specAmenities = await prisma.specification.upsert({
+    where: { subServiceId_key: { subServiceId: familyApt.id, key: "amenities" } },
+    update: {},
+    create: {
+      subServiceId: familyApt.id,
+      name: "Amenities",
+      key: "amenities",
+      type: SpecFieldType.MULTI_SELECT,
+      options: ["Lift", "Generator", "Gas", "Parking", "CCTV", "Rooftop"],
+      displayOrder: 5,
+    },
+  });
+
   await prisma.listing.upsert({
     where: { slug: "gulshan-3bed-apartment" },
     update: {},
@@ -197,6 +217,7 @@ async function main() {
           { specificationId: specBath.id, value: "3" },
           { specificationId: specSize.id, value: "1800" },
           { specificationId: specFurnished.id, value: "true" },
+          { specificationId: specAmenities.id, value: "|Lift|Generator|CCTV|Parking|" },
         ],
       },
     },

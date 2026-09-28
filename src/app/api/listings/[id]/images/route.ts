@@ -1,3 +1,4 @@
+import { refreshPublicSite } from "@/lib/revalidate";
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -31,5 +32,6 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
   });
 
   const images = await prisma.listingImage.findMany({ where: { listingId: params.id }, orderBy: { sortOrder: "asc" } });
+  refreshPublicSite();
   return NextResponse.json(images);
 }

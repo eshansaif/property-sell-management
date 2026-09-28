@@ -1,3 +1,4 @@
+import { refreshPublicSite } from "@/lib/revalidate";
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -25,6 +26,7 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
   }
 
   const updated = await prisma.subService.update({ where: { id: params.id }, data });
+  refreshPublicSite();
   return NextResponse.json(updated);
 }
 
@@ -37,9 +39,11 @@ export async function DELETE(_req: NextRequest, { params }: { params: { id: stri
   const listingCount = await prisma.listing.count({ where: { subServiceId: params.id } });
   if (listingCount > 0) {
     const archived = await prisma.subService.update({ where: { id: params.id }, data: { status: "ARCHIVED" } });
+    refreshPublicSite();
     return NextResponse.json({ archived: true, subService: archived });
   }
 
   await prisma.subService.delete({ where: { id: params.id } });
+  refreshPublicSite();
   return NextResponse.json({ ok: true });
 }

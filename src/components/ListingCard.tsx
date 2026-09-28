@@ -23,7 +23,7 @@ export function ListingCard({
   return (
     <Link
       href={`/services/${serviceSlug}/${subServiceSlug}/${slug}`}
-      className="card group flex flex-col overflow-hidden transition-shadow hover:shadow-md"
+      className="card-interactive group flex flex-col overflow-hidden"
     >
       <div className="relative h-48 w-full bg-surface-muted">
         {coverImage ? (

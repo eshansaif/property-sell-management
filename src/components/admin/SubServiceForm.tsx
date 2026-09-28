@@ -2,6 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { Combobox } from "@/components/ui/Combobox";
+import { useToast } from "@/components/ui/Toast";
+import { safeFetch, readError } from "@/lib/safe-fetch";
 
 type Service = { id: string; name: string };
 
@@ -13,6 +16,7 @@ export function SubServiceForm({
   initial?: Partial<{ name: string; serviceId: string; shortDesc: string; description: string; status: string; isFeatured: boolean; displayOrder: number }>;
 }) {
   const router = useRouter();
+  const toast = useToast();
   const [services, setServices] = useState<Service[]>([]);
   const [form, setForm] = useState({
     name: initial?.name ?? "",
@@ -41,14 +45,16 @@ export function SubServiceForm({
 
     const url = subServiceId ? `/api/sub-services/${subServiceId}` : "/api/sub-services";
     const method = subServiceId ? "PATCH" : "POST";
-    const res = await fetch(url, { method, headers: { "Content-Type": "application/json" }, body: JSON.stringify(form) });
+    const res = await safeFetch(url, { method, headers: { "Content-Type": "application/json" }, body: JSON.stringify(form) });
 
     setSaving(false);
     if (!res.ok) {
-      const data = await res.json();
-      setError(data.error ?? "Something went wrong.");
+const msg = await readError(res);
+      setError(msg);
+      toast.error("Couldn't save sub-service", msg);
       return;
     }
+    toast.success(subServiceId ? "Sub-service updated" : "Sub-service created");
     router.push("/admin/sub-services");
     router.refresh();
   }
@@ -57,10 +63,13 @@ export function SubServiceForm({
     <form onSubmit={onSubmit} className="card max-w-2xl space-y-5 p-6">
       <div>
         <label className="label">Parent service *</label>
-        <select className="input" required value={form.serviceId} onChange={(e) => setForm({ ...form, serviceId: e.target.value })}>
-          <option value="">Select a service</option>
-          {services.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
-        </select>
+        <Combobox
+          options={services.map((s) => ({ value: s.id, label: s.name }))}
+          value={form.serviceId}
+          onChange={(v) => setForm({ ...form, serviceId: v })}
+          placeholder="Select a service"
+          clearable={false}
+        />
       </div>
       <div>
         <label className="label">Name *</label>
@@ -77,11 +86,17 @@ export function SubServiceForm({
       <div className="grid grid-cols-2 gap-4">
         <div>
           <label className="label">Status</label>
-          <select className="input" value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value })}>
-            <option value="DRAFT">Draft</option>
-            <option value="PUBLISHED">Published</option>
-            <option value="ARCHIVED">Archived</option>
-          </select>
+          <Combobox
+            options={[
+              { value: "DRAFT", label: "Draft" },
+              { value: "PUBLISHED", label: "Published" },
+              { value: "ARCHIVED", label: "Archived" },
+            ]}
+            value={form.status}
+            onChange={(v) => setForm({ ...form, status: v })}
+            placeholder="Status"
+            clearable={false}
+          />
         </div>
         <div>
           <label className="label">Display order</label>

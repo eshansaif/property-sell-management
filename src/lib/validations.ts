@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { validatePassword } from "@/lib/password-policy";
 
 // Server-side validation. The frontend also validates for UX,
 // but every one of these schemas is re-run on the API route —
@@ -43,6 +44,17 @@ export const subServiceSchema = serviceSchema.extend({
   serviceId: z.string().cuid(),
 });
 
+export const customSpecInputSchema = z.object({
+  group: z.string().trim().max(60).optional().default(""),
+  label: z.string().trim().min(1, "Every specification row needs a label").max(80),
+  value: z.string().trim().min(1, "Every specification row needs a value").max(500),
+});
+
+export const passwordSchema = z.string().superRefine((v, ctx) => {
+  const err = validatePassword(v);
+  if (err) ctx.addIssue({ code: z.ZodIssueCode.custom, message: err });
+});
+
 export const listingSchema = z.object({
   serviceId: z.string().cuid(),
   subServiceId: z.string().cuid(),
@@ -54,6 +66,7 @@ export const listingSchema = z.object({
   status: z.enum(["DRAFT", "PUBLISHED", "ARCHIVED"]).default("DRAFT"),
   isFeatured: z.coerce.boolean().default(false),
   specs: z.record(z.string()).optional(),
+  customSpecs: z.array(customSpecInputSchema).max(100).optional(),
 });
 
 export const inquiryStatusUpdateSchema = z.object({

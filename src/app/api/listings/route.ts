@@ -1,3 +1,4 @@
+import { refreshPublicSite } from "@/lib/revalidate";
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -5,16 +6,21 @@ import { can } from "@/lib/rbac";
 import { prisma } from "@/lib/prisma";
 import { listingSchema } from "@/lib/validations";
 import { uniqueSlug } from "@/lib/slug";
+import { validateListingSpecs } from "@/lib/spec-validation";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const q = searchParams.get("q") || undefined;
   const status = searchParams.get("status") || undefined;
+  const serviceId = searchParams.get("serviceId") || undefined;
+  const subServiceId = searchParams.get("subServiceId") || undefined;
   const page = Math.max(1, Number(searchParams.get("page") || 1));
   const pageSize = 20;
 
   const where: any = {};
   if (status) where.status = status;
+  if (serviceId) where.serviceId = serviceId;
+  if (subServiceId) where.subServiceId = subServiceId;
   if (q) where.title = { contains: q, mode: "insensitive" };
 
   const [items, total] = await Promise.all([
@@ -42,7 +48,10 @@ export async function POST(req: NextRequest) {
   if (!parsed.success) {
     return NextResponse.json({ error: parsed.error.issues[0]?.message }, { status: 400 });
   }
-  const { specs, ...rest } = parsed.data;
+  const { specs, customSpecs, ...rest } = parsed.data;
+
+  const specError = await validateListingSpecs(rest.subServiceId, specs, rest.status === "PUBLISHED");
+  if (specError) return NextResponse.json({ error: specError }, { status: 400 });
 
   const slug = await uniqueSlug("listing", rest.title);
 
@@ -52,6 +61,9 @@ export async function POST(req: NextRequest) {
       slug,
       ownerId: session.user.id,
       publishedAt: rest.status === "PUBLISHED" ? new Date() : null,
+      customSpecs: customSpecs?.length
+        ? { create: customSpecs.map((c, i) => ({ group: c.group ?? "", label: c.label, value: c.value, sortOrder: i })) }
+        : undefined,
       specs: specs
         ? {
             create: Object.entries(specs)
@@ -65,6 +77,8 @@ export async function POST(req: NextRequest) {
   await prisma.auditLog.create({
     data: { userId: session.user.id, action: "CREATE", entity: "Listing", entityId: listing.id, next: JSON.stringify(listing) },
   });
+
+  refreshPublicSite();
 
   return NextResponse.json(listing, { status: 201 });
 }

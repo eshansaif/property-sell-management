@@ -17,7 +17,7 @@ export function ServiceCard({
   return (
     <Link
       href={`/services/${slug}`}
-      className="card group flex flex-col overflow-hidden transition-shadow hover:shadow-md"
+      className="card-interactive group flex flex-col overflow-hidden"
     >
       <div className="relative h-40 w-full bg-surface-muted">
         {coverImage ? (

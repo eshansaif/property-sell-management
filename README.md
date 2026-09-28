@@ -2,7 +2,7 @@
 
 A dynamic Service → Sub-service → Listing → Inquiry lead-management platform, built with Next.js 14 (App Router), TypeScript, Tailwind CSS, Prisma, PostgreSQL and NextAuth. Nothing about services, categories or specification fields is hardcoded — everything is admin-configurable through the dashboard.
 
-> **Honest scope note:** this is a solid, working foundation covering the core architecture and primary flows of the original spec (dynamic catalog, dynamic specs, context-aware inquiries, RBAC admin dashboard, SEO basics, security headers). It intentionally does **not** include everything from a 50-point enterprise brief in one pass — no automated test suite, no real file-upload storage (images are URL-based, ready for Vercel Blob/S3), no notification channels, no multi-tenancy. Those are documented as next steps below, matching the original spec's own "don't build every future feature now" guidance (section 42).
+> **Honest scope note:** this is a solid, working foundation covering the core architecture and primary flows of the original spec (dynamic catalog, dynamic specs, context-aware inquiries, RBAC admin dashboard, SEO basics, security headers). It intentionally does **not** include everything from a 50-point enterprise brief in one pass — no automated test suite, no notification channels, no multi-tenancy. Those are documented as next steps below, matching the original spec's own "don't build every future feature now" guidance (section 42).
 
 ---
 
@@ -60,13 +60,14 @@ docker run --name platform-db -e POSTGRES_PASSWORD=postgres -p 5432:5432 -d post
    - `NEXTAUTH_URL` — your production URL, e.g. `https://yourdomain.com`
    - `NEXT_PUBLIC_SITE_NAME`, `NEXT_PUBLIC_SITE_URL`
    - `SEED_ADMIN_EMAIL`, `SEED_ADMIN_PASSWORD` (only needed if you run the seed against prod)
-4. Deploy. The build command (`prisma generate && next build`, see `vercel.json`) handles Prisma client generation automatically.
-5. After the first deploy, run migrations against production once, from your machine:
+4. **Create the database schema before the first deploy** (the homepage is prerendered at build time and needs the tables to exist). From your machine:
    ```bash
    DATABASE_URL="<production-url>" npx prisma db push
-   DATABASE_URL="<production-url>" npm run db:seed   # optional, creates the first super admin
+   DATABASE_URL="<production-url>" npm run db:seed   # optional: creates the first super admin + demo content
    ```
-   (Or use `prisma migrate deploy` with a proper migration history for a real production workflow — `db push` is fine to get started but isn't migration-tracked.)
+   (For a team workflow, switch to `prisma migrate deploy` with tracked migrations — `db push` is fine to get started.)
+5. Deploy. The build command (`prisma generate && next build`, see `vercel.json`) generates the Prisma client automatically.
+6. Attach a **Blob store** to the project (Storage tab) so image uploads work — see section 6.
 
 ---
 
@@ -95,7 +96,7 @@ Dynamic `generateMetadata` on service/sub-service/listing pages, JSON-LD (`Produ
 
 ## 5. What to build next (in priority order)
 
-1. **Real image upload** — wire `Vercel Blob` (or S3) into the admin listing form instead of pasting URLs; the API contract (`PUT /api/listings/:id/images`) already expects a list of URLs, so this is a swap at the upload UI, not a schema change.
+1. ~~Real image upload~~ (done) — wire `Vercel Blob` (or S3) into the admin listing form instead of pasting URLs; the API contract (`PUT /api/listings/:id/images`) already expects a list of URLs, so this is a swap at the upload UI, not a schema change.
 2. **Automated tests** — Vitest/Playwright for the inquiry submission flow, auth, and RBAC boundaries (the spec's section 44).
 3. **Notifications** — email (Resend/SendGrid) on new inquiry; the `Inquiry` creation path in `src/app/api/inquiries/route.ts` is the single place to hook this in.
 4. **Search/filtering** — add query-param-driven filtering on `/services/[slug]/[sub]` using the `isFilterable` flag already present on `Specification`.
@@ -104,7 +105,72 @@ Dynamic `generateMetadata` on service/sub-service/listing pages, JSON-LD (`Produ
 
 ---
 
-## 6. Default login (after seeding)
+## 6. Image uploads (Vercel Blob, swappable later)
+
+Listing images are uploaded through `/api/upload`, which goes through a storage abstraction in `src/lib/storage.ts` — nothing else in the app talks to a storage SDK directly. Today it's wired to **Vercel Blob**:
+
+- On Vercel: attach a Blob store to your project (Storage tab → Create Database → Blob). `BLOB_READ_WRITE_TOKEN` is injected automatically — no extra config.
+- Locally: create a Blob store at vercel.com/storage, copy its token into `.env` as `BLOB_READ_WRITE_TOKEN`.
+
+To move to S3, Cloudinary, R2, or anything else later: add a branch in `uploadFile()`/`deleteFile()` in `src/lib/storage.ts` and set `STORAGE_PROVIDER` in env. The admin UI (`ImageUploader` component — drag-and-drop, multi-file, progress, drag-to-reorder, first image = cover) never needs to change.
+
+## 7. Search, filtering & pagination
+
+- **Public site**: the homepage search bar and `/services` search both query by name/description server-side. Each sub-service page auto-derives its available filters from that category's `isFilterable` specifications (e.g. "Bedrooms", "Facing") — the dropdown options are the distinct values actually in use, so filters never show empty or irrelevant choices for a category. All of it is URL-driven (`?q=`, `?spec_<id>=value`, `?page=`), so results are shareable, bookmarkable and back-button-safe, and pagination links are real `<a>` tags for SEO crawlability.
+- **Admin dashboard**: every list (services, sub-services, listings, inquiries) has debounced search, real pagination, and status/category filters — the service and sub-service pickers use the searchable `Combobox` component instead of plain `<select>` dropdowns once a list could realistically grow long.
+
+## 8. Mobile & navigation
+
+- The public header collapses into an animated hamburger menu with a slide-down panel below `md` breakpoint; the admin sidebar becomes a slide-in drawer with a backdrop on mobile.
+- All admin list-to-detail navigation uses Next's client-side router (`router.push` / `Link`) — there is no `window.location` hard navigation anywhere in the app, so moving between admin screens never full-page-reloads.
+- Every data-fetching view (public listing pages via `loading.tsx`, admin lists via inline skeletons) shows a skeleton matching its final layout instead of a spinner or blank flash.
+
+## 9. Specifications (dynamic listing fields)
+
+Admin → **Specifications** lets you define any number of fields — like product attributes in an e-commerce catalog — with no code changes:
+
+| Field type | Admin enters | Public page shows |
+|---|---|---|
+| Text | free text | as typed |
+| Number | number (+ optional unit) | `3`, `1,800 sqft` |
+| Measurement | number + unit | `5 katha` |
+| Currency | amount + currency label | `BDT 55,000` |
+| Yes / No | dropdown | ✓ Yes / ✕ No |
+| Single choice | pick from the options you define | the selected option |
+| Multiple choice | tick several options | tags |
+
+- **Scope**: attach a spec to an *entire service* (every sub-service under it inherits it) or to *one sub-service*.
+- **Options**: for choice types, add options as chips (press Enter, or paste comma-separated).
+- **Use as public filter**: visitors can filter that category by this field; the filter dropdown lists only values that actually exist.
+- **Required**: enforced on the client *and* server when a listing is published.
+- **Display order**: controls the order in the listing form and the public spec table.
+- Editing a spec's name/options/type is safe; deleting one removes its stored values from listings (you'll get a warning with the usage count).
+
+On the public listing page, specs render as a standard spec-sheet table (label / value rows, semantic `<table>` markup for accessibility) and are also emitted as schema.org `additionalProperty` structured data.
+
+## 10. Navigation, "All Listings" & naming
+
+- **Mega menu**: hovering *Services* in the header opens a two-column category tree (services on the left, their sub-services on the right) — like an e-commerce category menu. On mobile it becomes an accordion inside the hamburger panel. The tree is cached and refreshed instantly whenever an admin edits a service/sub-service.
+- **All Listings** (`/listings`): one page to search everything, filter by service → category → category-specific filters, sort and paginate. Filtered/sorted URLs are `noindex` and canonicalise to `/listings`.
+- **One place for names**: `src/lib/labels.ts` holds the menu/page names ("All Listings", "Services"…). Rename there and it changes on the public site and in the admin.
+
+## 11. Team, settings & security
+
+- **Settings → My profile / Password / Team / Site settings.** Admins can add other admins and staff, change roles, reset passwords (server-generated, shown once) and deactivate people.
+- Rules: Admins can manage Admin/Staff only; only Super Admins can create or manage Super Admins; nobody can demote/deactivate themselves; at least one active Super Admin always remains.
+- Deactivation/role changes take effect immediately (the session re-checks the database), not after the 8-hour token expires.
+- Password policy: 10–72 chars with a letter and a number. Login and password-change attempts are rate limited (in-memory per instance; swap for Upstash Redis when you scale out).
+- **Site settings** (name, tagline, contact, social links) feed the header, footer, page titles and SEO defaults.
+
+## 12. Notifications (toasts)
+
+Every action gives feedback: saves, deletes/archives, uploads, status changes, assignments, notes, login, password/profile/team/settings changes, and public inquiry submission. Network failures are caught (`src/lib/safe-fetch.ts`) and shown as readable errors instead of failing silently. Toasts pause on hover, are announced to screen readers, and respect reduced-motion.
+
+## 13. User manual
+
+`public/manual.html` (served at `/manual.html`, linked as **Help** in the admin header) is a printable Bangla guide covering every screen, the two ways to add specifications, roles, and troubleshooting. Use the browser's Print → Save as PDF to share it.
+
+## 14. Default login (after seeding)
 
 Set in `.env` before seeding — do not use the example defaults in production.
 ```

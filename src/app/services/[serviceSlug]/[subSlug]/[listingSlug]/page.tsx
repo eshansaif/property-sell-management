@@ -7,6 +7,9 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { ListingCard } from "@/components/ListingCard";
 import { InquiryForm } from "@/components/InquiryForm";
+import { formatSpecText } from "@/lib/spec-values";
+import { SpecTable, SpecValue, type SpecRowView } from "@/components/public/SpecSheet";
+import { LABELS } from "@/lib/labels";
 
 export const revalidate = 60;
 
@@ -23,6 +26,7 @@ async function getListing(serviceSlug: string, subSlug: string, listingSlug: str
       subService: true,
       images: { orderBy: { sortOrder: "asc" } },
       specs: { include: { specification: true }, orderBy: { specification: { displayOrder: "asc" } } },
+      customSpecs: { orderBy: { sortOrder: "asc" } },
     },
   });
   return listing;
@@ -60,6 +64,22 @@ export default async function ListingDetailPage({
     include: { images: { where: { isCover: true }, take: 1 } },
   });
 
+  const definedRows: SpecRowView[] = listing.specs.map((sp) => ({
+    key: sp.id,
+    label: sp.specification.name,
+    content: <SpecValue type={sp.specification.type} value={sp.value} unit={sp.specification.unit} />,
+  }));
+  const mainRows: SpecRowView[] = [
+    ...definedRows,
+    ...listing.customSpecs.filter((c) => !c.group).map((c) => ({ key: c.id, label: c.label, content: c.value })),
+  ];
+  const groups = new Map<string, SpecRowView[]>();
+  for (const c of listing.customSpecs) {
+    if (!c.group) continue;
+    if (!groups.has(c.group)) groups.set(c.group, []);
+    groups.get(c.group)!.push({ key: c.id, label: c.label, content: c.value });
+  }
+
   const contextLabel = `${listing.service.name} → ${listing.subService.name} → ${listing.title}`;
 
   const jsonLd = {
@@ -68,6 +88,14 @@ export default async function ListingDetailPage({
     name: listing.title,
     description: listing.shortDesc ?? undefined,
     image: listing.images.map((i) => i.url),
+    additionalProperty: [
+      ...listing.specs.map((sp) => ({
+        "@type": "PropertyValue",
+        name: sp.specification.name,
+        value: formatSpecText(sp.specification.type, sp.value, sp.specification.unit),
+      })),
+      ...listing.customSpecs.map((c) => ({ "@type": "PropertyValue", name: c.label, value: c.value })),
+    ],
     offers: listing.priceLabel ? { "@type": "Offer", priceCurrency: "BDT", price: undefined, availability: "https://schema.org/InStock", description: listing.priceLabel } : undefined,
   };
 
@@ -88,7 +116,7 @@ export default async function ListingDetailPage({
       <SiteHeader />
       <main className="container-page py-10 pb-28 md:pb-16">
         <nav className="mb-4 text-xs text-text-secondary">
-          <Link href="/services" className="hover:text-text-primary">Services</Link>
+          <Link href="/services" className="hover:text-text-primary">{LABELS.services}</Link>
           <span className="mx-2">/</span>
           <Link href={`/services/${listing.service.slug}`} className="hover:text-text-primary">{listing.service.name}</Link>
           <span className="mx-2">/</span>
@@ -125,22 +153,18 @@ export default async function ListingDetailPage({
               )}
             </div>
 
-            {/* Specifications */}
-            {listing.specs.length > 0 && (
-              <div className="mt-8">
-                <h2 className="mb-3 font-display text-lg text-text-primary">Specifications</h2>
-                <dl className="grid grid-cols-2 gap-x-6 gap-y-3 rounded-lg border border-border bg-surface p-5 sm:grid-cols-3">
-                  {listing.specs.map((s) => (
-                    <div key={s.id}>
-                      <dt className="text-xs text-text-secondary">{s.specification.name}</dt>
-                      <dd className="text-sm font-medium text-text-primary">
-                        {s.value}
-                        {s.specification.unit ? ` ${s.specification.unit}` : ""}
-                      </dd>
-                    </div>
-                  ))}
-                </dl>
-              </div>
+            {/* Specifications — standard spec-sheet tables */}
+            {(mainRows.length > 0 || groups.size > 0) && (
+              <section className="mt-10 space-y-6" aria-labelledby="specs-heading">
+                <h2 id="specs-heading" className="font-display text-lg text-text-primary">Specifications</h2>
+                {mainRows.length > 0 && <SpecTable rows={mainRows} caption={`Specifications for ${listing.title}`} />}
+                {Array.from(groups).map(([title, rows]) => (
+                  <div key={title}>
+                    <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-text-secondary">{title}</h3>
+                    <SpecTable rows={rows} caption={`${title} — ${listing.title}`} />
+                  </div>
+                ))}
+              </section>
             )}
 
             {listing.description && (

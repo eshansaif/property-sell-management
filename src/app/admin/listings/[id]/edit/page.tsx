@@ -5,7 +5,7 @@ import { ListingForm } from "@/components/admin/ListingForm";
 export default async function EditListingPage({ params }: { params: { id: string } }) {
   const listing = await prisma.listing.findUnique({
     where: { id: params.id },
-    include: { images: { orderBy: { sortOrder: "asc" } }, specs: true },
+    include: { images: { orderBy: { sortOrder: "asc" } }, specs: true, customSpecs: { orderBy: { sortOrder: "asc" } } },
   });
   if (!listing) return notFound();
 
@@ -29,6 +29,7 @@ export default async function EditListingPage({ params }: { params: { id: string
           isFeatured: listing.isFeatured,
           specValues,
           images: listing.images,
+          customSpecs: listing.customSpecs.map((c) => ({ group: c.group, label: c.label, value: c.value })),
         }}
       />
     </div>

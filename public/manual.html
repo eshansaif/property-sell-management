@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>ব্যবহার নির্দেশিকা — সহজ ম্যানুয়াল</title>
+<style>
+  :root { --ink:#1B2320; --muted:#5B6560; --line:#E3DFD4; --bg:#F7F6F2; --brand:#1E362E; --accent:#A9793E; --soft:#F0EEE7; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font:16px/1.75 "Noto Sans Bengali","Kalpurush","Segoe UI",system-ui,sans-serif; }
+  .wrap { max-width: 860px; margin: 0 auto; padding: 32px 20px 80px; }
+  header.hero { background:var(--brand); color:#fff; padding:44px 20px; }
+  header.hero .wrap { padding-bottom:0; padding-top:0; }
+  header.hero h1 { margin:0 0 8px; font-size:30px; line-height:1.3; }
+  header.hero p { margin:0; opacity:.85; }
+  nav.toc { background:#fff; border:1px solid var(--line); border-radius:12px; padding:20px 24px; margin:28px 0; }
+  nav.toc h2 { margin:0 0 8px; font-size:18px; }
+  nav.toc ol { margin:0; padding-left:22px; columns:2; column-gap:32px; }
+  nav.toc a { color:var(--brand); text-decoration:none; } nav.toc a:hover { text-decoration:underline; }
+  section { background:#fff; border:1px solid var(--line); border-radius:12px; padding:24px; margin:22px 0; }
+  h2 { margin:0 0 12px; font-size:22px; color:var(--brand); }
+  h3 { margin:22px 0 6px; font-size:17px; }
+  p, li { color:#26302c; }
+  ol.steps { counter-reset:s; list-style:none; padding:0; }
+  ol.steps > li { counter-increment:s; position:relative; padding:4px 0 10px 44px; }
+  ol.steps > li::before { content:counter(s); position:absolute; left:0; top:4px; width:30px; height:30px; border-radius:50%; background:var(--brand); color:#fff; text-align:center; line-height:30px; font-weight:600; font-size:14px; }
+  .tip, .warn, .eg { border-radius:10px; padding:12px 16px; margin:14px 0; font-size:15px; }
+  .tip { background:#EEF6F1; border-left:4px solid #2F6F4E; }
+  .warn { background:#FBF1E6; border-left:4px solid var(--accent); }
+  .eg { background:var(--soft); border-left:4px solid var(--brand); }
+  .tip b, .warn b, .eg b { display:block; margin-bottom:2px; }
+  table { width:100%; border-collapse:collapse; margin:12px 0; font-size:15px; }
+  th, td { border:1px solid var(--line); padding:9px 12px; text-align:left; vertical-align:top; }
+  th { background:var(--soft); }
+  code, .k { background:var(--soft); border:1px solid var(--line); border-radius:6px; padding:1px 7px; font-size:14px; font-family:ui-monospace,Consolas,monospace; white-space:nowrap; }
+  .flow { display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin:12px 0; }
+  .flow span { background:var(--soft); border:1px solid var(--line); border-radius:8px; padding:6px 12px; font-weight:600; }
+  .flow i { color:var(--muted); font-style:normal; }
+  footer { text-align:center; color:var(--muted); font-size:13px; margin-top:30px; }
+  .print { float:right; background:var(--brand); color:#fff; border:0; border-radius:8px; padding:8px 14px; cursor:pointer; font:inherit; font-size:14px; }
+  @media (max-width:640px){ nav.toc ol{columns:1} header.hero h1{font-size:24px} section{padding:18px} }
+  @media print { .print{display:none} body{background:#fff} section{break-inside:avoid; border-color:#ccc} header.hero{background:#fff;color:#000;border-bottom:2px solid #000} }
+</style>
+</head>
+<body>
+<header class="hero"><div class="wrap">
+  <button class="print" onclick="window.print()">প্রিন্ট / PDF</button>
+  <h1>ব্যবহার নির্দেশিকা</h1>
+  <p>Service ও Listing ম্যানেজমেন্ট প্ল্যাটফর্ম — Admin ও Visitor দুজনের জন্য সহজ গাইড</p>
+</div></header>
+
+<div class="wrap">
+
+<nav class="toc"><h2>সূচিপত্র</h2>
+<ol>
+  <li><a href="#s1">সিস্টেমটা কীভাবে কাজ করে</a></li>
+  <li><a href="#s2">লগইন ও প্রথম কাজ</a></li>
+  <li><a href="#s3">Admin মেনু পরিচিতি</a></li>
+  <li><a href="#s4">Service ও Sub-service বানানো</a></li>
+  <li><a href="#s5">Specification — কোনটা কখন</a></li>
+  <li><a href="#s6">নতুন Listing বানানো</a></li>
+  <li><a href="#s7">Inquiry সামলানো</a></li>
+  <li><a href="#s8">টিম মেম্বার ও Role</a></li>
+  <li><a href="#s9">Site Settings ও পাসওয়ার্ড</a></li>
+  <li><a href="#s10">Visitor কীভাবে সাইট ব্যবহার করবে</a></li>
+  <li><a href="#s11">মেসেজ (Toast) কী বোঝায়</a></li>
+  <li><a href="#s12">সমস্যা হলে কী করবেন</a></li>
+  <li><a href="#s13">প্রতিদিনের চেকলিস্ট</a></li>
+</ol></nav>
+
+<section id="s1">
+<h2>১. সিস্টেমটা কীভাবে কাজ করে</h2>
+<p>পুরো সিস্টেম চারটা ধাপে সাজানো। এটা বুঝলেই বাকি সব সহজ।</p>
+<div class="flow"><span>Service</span><i>→</i><span>Sub-service</span><i>→</i><span>Listing</span><i>→</i><span>Inquiry</span></div>
+<div class="eg"><b>উদাহরণ</b>
+  Service = <em>Land Sale</em> → Sub-service = <em>Residential Land</em> → Listing = <em>৫ কাঠা জমি, বসুন্ধরা</em> → Inquiry = কোনো কাস্টমারের পাঠানো "আমি আগ্রহী" মেসেজ।</div>
+<ul>
+  <li><b>Service</b> — বড় বিভাগ (Land Sale, Flat Rent…)।</li>
+  <li><b>Sub-service</b> — বিভাগের ভেতরের ধরন (Residential Land, Commercial Land…)।</li>
+  <li><b>Listing</b> — আসল আইটেম, যেটা কাস্টমার দেখে (ছবি, দাম, স্পেসিফিকেশন সহ)।</li>
+  <li><b>Inquiry</b> — কাস্টমারের পাঠানো আগ্রহের মেসেজ; আপনারা Admin থেকে ফলো-আপ করেন।</li>
+</ul>
+<div class="tip"><b>মনে রাখুন</b>কোনো কিছুই কোডে বাঁধা নয়। নতুন Service, নতুন ক্যাটাগরি, নতুন স্পেসিফিকেশন — সব Admin থেকেই বানানো যায়।</div>
+</section>
+
+<section id="s2">
+<h2>২. লগইন ও প্রথম কাজ</h2>
+<ol class="steps">
+  <li>ব্রাউজারে আপনার সাইটের ঠিকানার শেষে <code>/admin/login</code> লিখুন (বা সাইটের ফুটারে <b>Team login</b> চাপুন)।</li>
+  <li>ইমেইল ও পাসওয়ার্ড দিয়ে <b>Sign in</b> চাপুন।</li>
+  <li>প্রথম লগইনেই <b>Settings → Password</b> এ গিয়ে পাসওয়ার্ড বদলান।</li>
+  <li><b>Settings → Site settings</b> এ সাইটের নাম, ফোন, ইমেইল, ঠিকানা দিন — এগুলো হেডার/ফুটারে দেখাবে।</li>
+</ol>
+<div class="warn"><b>সতর্কতা</b>সিস্টেম প্রথমবার চালু করার সময় দেওয়া ডিফল্ট পাসওয়ার্ড (যেমন <code>ChangeMe123!</code>) রেখে দেবেন না।</div>
+<p>পাসওয়ার্ডের নিয়ম: কমপক্ষে ১০ অক্ষর, তাতে অন্তত একটা অক্ষর ও একটা সংখ্যা থাকতে হবে।</p>
+</section>
+
+<section id="s3">
+<h2>৩. Admin মেনু পরিচিতি</h2>
+<table>
+<tr><th>মেনু</th><th>কী করবেন</th></tr>
+<tr><td><b>Dashboard</b></td><td>এক নজরে মোট Service, Listing, নতুন ও পেন্ডিং Inquiry।</td></tr>
+<tr><td><b>All Listings</b></td><td>সব Listing দেখা, খোঁজা, নতুন বানানো, এডিট, আর্কাইভ। (সবচেয়ে বেশি ব্যবহৃত মেনু, তাই উপরেই)</td></tr>
+<tr><td><b>Inquiries</b></td><td>কাস্টমারের পাঠানো Inquiry দেখা ও ফলো-আপ।</td></tr>
+<tr><td><b>Services</b></td><td>বড় বিভাগ বানানো/এডিট।</td></tr>
+<tr><td><b>Sub-services</b></td><td>বিভাগের ভেতরের ক্যাটাগরি বানানো/এডিট।</td></tr>
+<tr><td><b>Specifications</b></td><td>ক্যাটাগরি-ভিত্তিক নির্দিষ্ট ফিল্ড (Bedrooms, Facing…) সেট করা।</td></tr>
+<tr><td><b>Settings</b></td><td>নিজের প্রোফাইল, পাসওয়ার্ড, টিম, সাইট সেটিংস।</td></tr>
+</table>
+<p>মোবাইলে উপরের বাঁ দিকের তিন দাগের (☰) বোতাম চাপলে মেনু খুলবে। উপরের ডানে <b>Help</b> চাপলে এই ম্যানুয়াল খুলবে।</p>
+<p>কোন মেনু দেখা যাবে তা আপনার Role এর উপর নির্ভর করে (দেখুন ধাপ ৮)।</p>
+</section>
+
+<section id="s4">
+<h2>৪. Service ও Sub-service বানানো</h2>
+<h3>Service বানানো</h3>
+<ol class="steps">
+  <li><b>Services → New service</b> চাপুন।</li>
+  <li>নাম দিন (যেমন <em>Land Sale</em>)। ছোট বর্ণনা লিখুন। চাইলে কভার ছবির লিংক দিন।</li>
+  <li><b>Status</b> = <b>Published</b> করুন — না করলে সাইটে দেখা যাবে না।</li>
+  <li><b>Save service</b> চাপুন। সাথে সাথে উপরের ড্রপডাউন মেনুতেও চলে আসবে।</li>
+</ol>
+<h3>Sub-service বানানো</h3>
+<ol class="steps">
+  <li><b>Sub-services → New sub-service</b> চাপুন।</li>
+  <li><b>Parent service</b> ড্রপডাউনে টাইপ করে সার্চ করে Service বেছে নিন।</li>
+  <li>নাম দিন (যেমন <em>Residential Land</em>), Status = Published, Save।</li>
+</ol>
+<div class="tip"><b>টিপস</b>Display order ছোট সংখ্যা দিলে মেনুতে আগে দেখাবে। Draft রাখলে শুধু আপনারা দেখতে পাবেন।</div>
+<div class="warn"><b>মুছলে কী হয়</b>যে Service/Sub-service এ Listing আছে, সেটা Delete করলে আসলে <b>Archived</b> হয় (ডেটা হারায় না)। স্ক্রিনে সেই মেসেজও দেখাবে।</div>
+</section>
+
+<section id="s5">
+<h2>৫. Specification — কোনটা কখন</h2>
+<p>Listing এর বিস্তারিত তথ্য (এরিয়া, রুম সংখ্যা, মালিকানা…) যুক্ত করার <b>দুইটা পদ্ধতি</b> আছে। দুটোই সাইটে সুন্দর টেবিল হিসেবে দেখায়।</p>
+
+<h3>পদ্ধতি ক — Additional details (Listing বানানোর সময় সরাসরি)</h3>
+<p>Listing ফর্মের ভেতরেই <b>"Additional details"</b> নামে একটা বক্স আছে। এখানে যত খুশি <b>Label : Value</b> সারি যোগ ও মুছতে পারবেন।</p>
+<ol class="steps">
+  <li><b>+ Add row</b> চাপুন। Label লিখুন (যেমন <em>Ownership</em>), Value লিখুন (<em>Freehold</em>)।</li>
+  <li>Value ঘরে <b>Enter</b> চাপলে নিচে নতুন সারি আসবে — দ্রুত অনেকগুলো লেখা যায়।</li>
+  <li>↑ ↓ বোতামে সারির ক্রম বদলান, ✕ চাপলে সারি মুছে যাবে।</li>
+  <li>গুছিয়ে দেখাতে চাইলে <b>+ Add another section</b> চাপুন এবং Section title দিন (যেমন <em>Legal &amp; documents</em>)। সাইটে প্রতিটা সেকশন আলাদা টেবিল হবে।</li>
+  <li>আগে ব্যবহার করা Label গুলো নিচে <b>Quick add</b> বোতাম ও অটো-সাজেশন হিসেবে আসবে — এতে বানান একই থাকে।</li>
+</ol>
+<div class="eg"><b>উদাহরণ</b>
+  Section: <em>Legal &amp; documents</em> → Ownership: Freehold, Mutation: Completed<br>
+  Section: <em>Location advantages</em> → Nearby: School, hospital, main road</div>
+
+<h3>পদ্ধতি খ — Specifications মেনু (ক্যাটাগরির জন্য একবার সেট করুন)</h3>
+<p>একই ধরনের অনেক Listing এ একই ফিল্ড লাগলে (যেমন সব Flat এ Bedrooms) একবারই সেট করে রাখুন। তারপর ওই ক্যাটাগরির প্রতিটা Listing ফর্মে ফিল্ডটা নিজে থেকে আসবে।</p>
+<ol class="steps">
+  <li><b>Specifications → New specification</b> চাপুন।</li>
+  <li><b>Where does it apply?</b> — পুরো Service এ, নাকি শুধু একটা Sub-service এ।</li>
+  <li>নাম দিন (যেমন <em>Bedrooms</em>) এবং <b>Field type</b> বেছে নিন:
+    <table>
+      <tr><th>ধরন</th><th>কখন</th></tr>
+      <tr><td>Text</td><td>যেকোনো লেখা</td></tr>
+      <tr><td>Number</td><td>শুধু সংখ্যা (Bedrooms)</td></tr>
+      <tr><td>Measurement</td><td>সংখ্যা + একক (১৮০০ sqft, ৫ katha)</td></tr>
+      <tr><td>Currency</td><td>টাকার অংক</td></tr>
+      <tr><td>Yes / No</td><td>হ্যাঁ/না (Furnished)</td></tr>
+      <tr><td>Single choice</td><td>একটা বেছে নেওয়া (Facing: North/South…)</td></tr>
+      <tr><td>Multiple choice</td><td>একাধিক বেছে নেওয়া (Amenities: Lift, Gas…)</td></tr>
+    </table></li>
+  <li>Single/Multiple choice হলে অপশনগুলো টাইপ করে <b>Enter</b> চাপুন (বা কমা দিয়ে একসাথে পেস্ট করুন)।</li>
+  <li><b>Use as a public filter</b> টিক দিলে কাস্টমার এই ফিল্ড দিয়ে ফিল্টার করতে পারবে।</li>
+  <li><b>Required</b> টিক দিলে Publish করার সময় ঘরটা ফাঁকা রাখা যাবে না।</li>
+</ol>
+
+<h3>কোনটা কখন ব্যবহার করবেন?</h3>
+<table>
+<tr><th></th><th>Additional details (ক)</th><th>Specifications মেনু (খ)</th></tr>
+<tr><td>কেমন তথ্যের জন্য</td><td>শুধু এই Listing এর বিশেষ তথ্য</td><td>ক্যাটাগরির সব Listing এ যে তথ্য থাকে</td></tr>
+<tr><td>আগে সেটআপ লাগে?</td><td>না, সরাসরি লিখুন</td><td>হ্যাঁ, একবার সেট করতে হয়</td></tr>
+<tr><td>কাস্টমার ফিল্টার করতে পারবে?</td><td>না (তবে সার্চে খুঁজে পাবে)</td><td>হ্যাঁ, চাইলে</td></tr>
+<tr><td>সবচেয়ে ভালো কাজে</td><td>মালিকানা, আশেপাশের সুবিধা, বিশেষ নোট</td><td>রুম সংখ্যা, এরিয়া, ফেসিং, ফার্নিশড</td></tr>
+</table>
+<div class="tip"><b>সহজ নিয়ম</b>কাস্টমার যে তথ্য দিয়ে <u>বাছাই</u> করবে → পদ্ধতি খ। বাকি সব তথ্য → পদ্ধতি ক। চাইলে দুটো একসাথেও ব্যবহার করতে পারেন।</div>
+</section>
+
+<section id="s6">
+<h2>৬. নতুন Listing বানানো</h2>
+<ol class="steps">
+  <li><b>All Listings → New listing</b> চাপুন।</li>
+  <li><b>Basic information</b>: Title লিখুন। Service ও Sub-service ড্রপডাউনে টাইপ করে বেছে নিন (আগে Service, তারপর Sub-service)। দাম (যেমন <em>৳৫৫,০০০ / month</em> বা <em>Negotiable</em>), লোকেশন, ছোট ও পূর্ণ বর্ণনা দিন।</li>
+  <li>Sub-service বাছার পর ওই ক্যাটাগরির <b>Specifications</b> ঘর নিজে থেকে আসবে — পূরণ করুন।</li>
+  <li><b>Additional details</b>: প্রয়োজনীয় Label–Value সারি যোগ করুন (ধাপ ৫)।</li>
+  <li><b>Images</b>: ছবি টেনে এনে ছাড়ুন (drag &amp; drop) অথবা বক্সে ক্লিক করে বাছুন। একসাথে অনেকগুলো দেওয়া যায় (প্রতিটা ৮MB পর্যন্ত; JPG/PNG/WebP/AVIF)। ছবি টেনে সাজিয়ে ক্রম বদলান — <b>প্রথম ছবিটাই Cover</b>। ছবির উপরে মাউস নিলে ✕ দিয়ে বাদ দেওয়া যায়।</li>
+  <li><b>Publishing</b>: Status বেছে নিন —
+    <table>
+      <tr><td><b>Draft</b></td><td>শুধু আপনারা দেখবেন, সাইটে নয়</td></tr>
+      <tr><td><b>Published</b></td><td>সাইটে লাইভ</td></tr>
+      <tr><td><b>Archived</b></td><td>লুকানো, কিন্তু ডেটা থাকে</td></tr>
+    </table>
+    <b>Featured</b> টিক দিলে হোমপেজে আলাদা করে দেখাবে।</li>
+  <li><b>Save listing</b> চাপুন। সবুজ মেসেজ এলে কাজ হয়ে গেছে।</li>
+</ol>
+<div class="warn"><b>ছবি আপলোড না হলে</b>ছবির স্টোরেজ (Vercel Blob) চালু আছে কিনা দেখুন — ধাপ ১২ এ বিস্তারিত আছে।</div>
+<div class="tip"><b>খোঁজা ও ফিল্টার</b>All Listings পেজে নাম দিয়ে সার্চ করুন, Service ও Status ড্রপডাউন দিয়ে ফিল্টার করুন। পেজ বদলাতে নিচের পেজ নম্বর ব্যবহার করুন।</div>
+</section>
+
+<section id="s7">
+<h2>৭. Inquiry সামলানো</h2>
+<p>কাস্টমার ফর্ম পাঠালেই <b>Inquiries</b> এ নতুন সারি (Status: NEW) আসে।</p>
+<ol class="steps">
+  <li><b>Inquiries</b> খুলুন। উপরের বোতাম (All, NEW, CONTACTED…) দিয়ে স্ট্যাটাস অনুযায়ী দেখুন।</li>
+  <li>সারিতে ক্লিক করলে বিস্তারিত পেজ খুলবে — কাস্টমারের নাম, ফোন, মেসেজ, কোন Listing এ আগ্রহী তা দেখা যাবে।</li>
+  <li><b>Call / WhatsApp / Email</b> বোতাম চেপে সরাসরি যোগাযোগ করুন।</li>
+  <li><b>Assigned to</b> ড্রপডাউনে টিমের একজনকে দায়িত্ব দিন।</li>
+  <li>ডানদিকের স্ট্যাটাস বোতাম দিয়ে অবস্থা বদলান।</li>
+  <li><b>Internal notes</b> এ নিজেদের জন্য নোট রাখুন (কাস্টমার এটা দেখে না)।</li>
+</ol>
+<table>
+<tr><th>Status</th><th>মানে</th></tr>
+<tr><td>NEW</td><td>নতুন এসেছে, কেউ যোগাযোগ করেনি</td></tr>
+<tr><td>CONTACTED</td><td>যোগাযোগ করা হয়েছে</td></tr>
+<tr><td>IN PROGRESS</td><td>আলোচনা/কাজ চলছে</td></tr>
+<tr><td>FOLLOW UP</td><td>পরে আবার ফোন/মেসেজ করতে হবে</td></tr>
+<tr><td>CONVERTED</td><td>ডিল হয়েছে ✔</td></tr>
+<tr><td>CLOSED</td><td>আর কাজ নেই</td></tr>
+<tr><td>REJECTED</td><td>কাস্টমার/আমরা বাতিল করেছি</td></tr>
+</table>
+<p>নিচের <b>Activity timeline</b> এ কে কখন কী করেছে সব জমা থাকে।</p>
+</section>
+
+<section id="s8">
+<h2>৮. টিম মেম্বার ও Role</h2>
+<h3>নতুন Admin/Staff যোগ করা</h3>
+<ol class="steps">
+  <li><b>Settings → Team → Add team member</b> চাপুন।</li>
+  <li>নাম, ইমেইল দিন, Role বেছে নিন।</li>
+  <li><b>Generate</b> চেপে একটা শক্ত অস্থায়ী পাসওয়ার্ড বানান।</li>
+  <li><b>Add member</b> চাপুন। স্ক্রিনে ইমেইল ও পাসওয়ার্ড একবারই দেখাবে — <b>Copy</b> করে নিরাপদে ওই ব্যক্তিকে দিন এবং তাকে পাসওয়ার্ড বদলাতে বলুন।</li>
+</ol>
+<table>
+<tr><th>Role</th><th>কী করতে পারে</th></tr>
+<tr><td><b>Super Admin</b></td><td>সবকিছু, অন্য Admin ও Super Admin সহ</td></tr>
+<tr><td><b>Admin</b></td><td>Service, Listing, Inquiry, টিম (Admin/Staff), সাইট সেটিংস</td></tr>
+<tr><td><b>Staff</b></td><td>Listing দেখা এবং Inquiry সামলানো</td></tr>
+</table>
+<h3>অন্যান্য কাজ</h3>
+<ul>
+  <li><b>Role বদলানো</b> — সদস্যের সারির Role ড্রপডাউন থেকে।</li>
+  <li><b>Reset password</b> — সিস্টেম নতুন অস্থায়ী পাসওয়ার্ড বানিয়ে একবার দেখাবে।</li>
+  <li><b>Deactivate</b> — সাথে সাথে লগইন বন্ধ হয়ে যায় (আগে থেকে লগইন থাকলেও)। পরে <b>Reactivate</b> করা যায়।</li>
+</ul>
+<div class="warn"><b>নিরাপত্তা নিয়ম</b>নিজের Role বদলানো/নিজেকে Deactivate করা যায় না। সিস্টেমে সবসময় অন্তত একজন সক্রিয় Super Admin থাকতেই হবে।</div>
+</section>
+
+<section id="s9">
+<h2>৯. Site Settings ও পাসওয়ার্ড</h2>
+<ul>
+  <li><b>My profile</b> — নিজের নাম বদলান।</li>
+  <li><b>Password</b> — বর্তমান পাসওয়ার্ড দিয়ে নতুন পাসওয়ার্ড দিন (দুইবার)। "Show passwords" টিক দিলে লেখা দেখা যায়।</li>
+  <li><b>Site settings</b> (Admin/Super Admin) — সাইটের নাম, ট্যাগলাইন, ফোন, ইমেইল, WhatsApp, ঠিকানা, Facebook/Instagram লিংক। Save করার সাথে সাথে হেডার, ফুটার ও ব্রাউজার ট্যাবের নাম বদলে যায়।</li>
+</ul>
+<div class="tip"><b>মেনুর নাম বদলাতে চাইলে</b>"All Listings" এর মতো নামগুলো একটাই ফাইলে (<code>src/lib/labels.ts</code>) আছে। ডেভেলপারকে বললে সেখানে বদলালেই সাইট ও Admin দুই জায়গাতেই বদলে যাবে।</div>
+</section>
+
+<section id="s10">
+<h2>১০. Visitor (কাস্টমার) কীভাবে সাইট ব্যবহার করবে</h2>
+<p>কাস্টমারের কোনো অ্যাকাউন্ট লাগে না। সে যা করবে:</p>
+<ol class="steps">
+  <li><b>ড্রপডাউন মেনু</b> — উপরের <b>Services</b> এর উপর মাউস নিলে বাঁ পাশে সব Service, ডান পাশে তার Sub-service দেখা যায় (ই-কমার্সের ক্যাটাগরি মেনুর মতো)। মোবাইলে ☰ চেপে Service এর পাশের তীর চাপলে Sub-service খোলে।</li>
+  <li><b>All Listings</b> — উপরের মেনু থেকে সব Listing একসাথে দেখা যায়। এখানে:
+    <ul>
+      <li>সার্চ বক্সে নাম, লোকেশন বা বিবরণের কথা লিখে খোঁজা;</li>
+      <li>Service ও Category ড্রপডাউনে টাইপ করে বেছে নেওয়া;</li>
+      <li>Category বাছলে সেই ক্যাটাগরির বিশেষ ফিল্টার (যেমন Bedrooms, Facing) আসে;</li>
+      <li>Sort (Newest, Oldest, A–Z) এবং পেজ নম্বর।</li>
+    </ul></li>
+  <li><b>Listing পেজ</b> — ছবির গ্যালারি, দাম, স্পেসিফিকেশন টেবিল, বর্ণনা ও সম্পর্কিত Listing দেখা যায়।</li>
+  <li><b>Inquiry পাঠানো</b> — "Send Inquiry" (মোবাইলে নিচে ভাসমান <b>I'm Interested</b> বোতাম) চেপে নাম, ফোন ও মেসেজ দিয়ে পাঠায়। যে Listing/Service থেকে পাঠাচ্ছে তা নিজে থেকেই ফর্মে ধরা থাকে — আবার বাছতে হয় না।</li>
+  <li>পাঠানো হলে সবুজ নিশ্চিতকরণ মেসেজ দেখায় এবং আপনাদের Inquiries এ সাথে সাথে চলে আসে।</li>
+</ol>
+</section>
+
+<section id="s11">
+<h2>১১. মেসেজ (Toast) কী বোঝায়</h2>
+<p>প্রতিটা কাজের পর স্ক্রিনের কোণায় ছোট একটা মেসেজ আসে এবং কিছুক্ষণ পর নিজেই চলে যায়। মাউস রাখলে থেমে থাকে; ✕ চাপলে বন্ধ হয়।</p>
+<table>
+<tr><td><b>সবুজ ✔</b></td><td>কাজ সফল (Saved, Created, Deleted…)</td></tr>
+<tr><td><b>লাল ✕</b></td><td>কাজ হয়নি — কারণটা লেখা থাকে (ফাঁকা ঘর, ইন্টারনেট সমস্যা, অনুমতি নেই…)</td></tr>
+<tr><td><b>নীল ℹ</b></td><td>তথ্য (যেমন "আর্কাইভ করা হয়েছে", "Copy হয়েছে")</td></tr>
+</table>
+</section>
+
+<section id="s12">
+<h2>১২. সমস্যা হলে কী করবেন</h2>
+<table>
+<tr><th>সমস্যা</th><th>সমাধান</th></tr>
+<tr><td>Listing সাইটে দেখা যাচ্ছে না</td><td>Status <b>Published</b> কিনা দেখুন। এর Service ও Sub-service ও Published কিনা দেখুন।</td></tr>
+<tr><td>মেনুতে নতুন Service আসছে না</td><td>Service এর Status Published করুন এবং অন্তত একটা Published Sub-service রাখুন।</td></tr>
+<tr><td>ছবি আপলোড হচ্ছে না</td><td>ছবি ৮MB এর কম ও JPG/PNG/WebP/AVIF কিনা দেখুন। তারপরও না হলে ডেভেলপারকে বলুন Vercel প্রজেক্টে <b>Blob store</b> যুক্ত আছে কিনা (<code>BLOB_READ_WRITE_TOKEN</code>)।</td></tr>
+<tr><td>Publish করা যাচ্ছে না — "Missing required specification"</td><td>Required চিহ্নিত (*) ঘরগুলো পূরণ করুন।</td></tr>
+<tr><td>লগইন হচ্ছে না</td><td>ইমেইল/পাসওয়ার্ড আবার দিন। অনেকবার ভুল দিলে ১৫ মিনিট অপেক্ষা করুন। তারপরও না হলে অন্য Admin কে দিয়ে <b>Reset password</b> করান।</td></tr>
+<tr><td>"Your access has ended" মেসেজ</td><td>আপনার অ্যাকাউন্ট Deactivate বা বদল করা হয়েছে। অন্য Admin এর সাথে কথা বলুন।</td></tr>
+<tr><td>কোনো ফিল্টার দেখা যাচ্ছে না</td><td>Specification এ <b>Use as a public filter</b> টিক দিয়েছেন কিনা এবং ওই ক্যাটাগরির অন্তত একটা Published Listing এ মান আছে কিনা দেখুন।</td></tr>
+<tr><td>Delete করলাম কিন্তু আছে</td><td>ভেতরে Listing থাকলে সেটা Archived হয়। এটাই স্বাভাবিক, ডেটা সুরক্ষিত থাকে।</td></tr>
+</table>
+</section>
+
+<section id="s13">
+<h2>১৩. প্রতিদিনের চেকলিস্ট</h2>
+<ul>
+  <li>☐ সকালে <b>Inquiries → NEW</b> দেখে নতুন সবগুলোতে যোগাযোগ করুন ও Assign করুন।</li>
+  <li>☐ <b>FOLLOW UP</b> স্ট্যাটাসের Inquiry গুলোতে আজ ফোন করুন।</li>
+  <li>☐ বিক্রি/ভাড়া হয়ে যাওয়া Listing <b>Archived</b> করুন।</li>
+  <li>☐ নতুন Listing <b>ভালো ছবি</b> ও সম্পূর্ণ তথ্য দিয়ে Published করুন।</li>
+  <li>☐ সপ্তাহে একবার টিম মেম্বারদের তালিকা দেখুন — যারা আর কাজ করে না তাদের Deactivate করুন।</li>
+</ul>
+</section>
+
+<footer>এই ম্যানুয়াল সিস্টেমের ভেতরেও আছে: Admin → উপরের ডানে <b>Help</b></footer>
+</div>
+</body>
+</html>

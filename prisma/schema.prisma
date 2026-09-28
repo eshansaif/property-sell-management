@@ -193,6 +193,7 @@ model Listing {
 
   images        ListingImage[]
   specs         ListingSpecificationValue[]
+  customSpecs   ListingCustomSpec[]
   inquiries     Inquiry[]
 
   @@index([serviceId, subServiceId, status])
@@ -308,4 +309,23 @@ model AuditLog {
 
   @@index([entity, entityId])
   @@index([createdAt])
+}
+
+// ------------------------------------------------------------
+// FREE-FORM PER-LISTING SPECIFICATIONS
+// Lets an editor add any number of "Label: Value" rows directly inside
+// a listing (optionally grouped under a section title), with no
+// pre-defined Specification needed. Complements the definition-based
+// Specification system (which is best for filterable, consistent fields).
+// ------------------------------------------------------------
+model ListingCustomSpec {
+  id        String  @id @default(cuid())
+  listingId String
+  listing   Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  group     String  @default("")
+  label     String
+  value     String
+  sortOrder Int     @default(0)
+
+  @@index([listingId, sortOrder])
 }

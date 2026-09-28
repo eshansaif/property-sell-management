@@ -2,6 +2,9 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Combobox } from "@/components/ui/Combobox";
+import { useToast } from "@/components/ui/Toast";
+import { safeFetch, readError } from "@/lib/safe-fetch";
 
 type Props = {
   serviceId?: string;
@@ -13,6 +16,7 @@ type Props = {
 
 export function ServiceForm({ serviceId, initial }: Props) {
   const router = useRouter();
+  const toast = useToast();
   const [form, setForm] = useState({
     name: initial?.name ?? "",
     shortDesc: initial?.shortDesc ?? "",
@@ -35,7 +39,7 @@ export function ServiceForm({ serviceId, initial }: Props) {
     const url = serviceId ? `/api/services/${serviceId}` : "/api/services";
     const method = serviceId ? "PATCH" : "POST";
 
-    const res = await fetch(url, {
+    const res = await safeFetch(url, {
       method,
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(form),
@@ -43,10 +47,12 @@ export function ServiceForm({ serviceId, initial }: Props) {
 
     setSaving(false);
     if (!res.ok) {
-      const data = await res.json();
-      setError(data.error ?? "Something went wrong.");
+const msg = await readError(res);
+      setError(msg);
+      toast.error("Couldn't save service", msg);
       return;
     }
+    toast.success(serviceId ? "Service updated" : "Service created");
     router.push("/admin/services");
     router.refresh();
   }
@@ -72,11 +78,17 @@ export function ServiceForm({ serviceId, initial }: Props) {
       <div className="grid grid-cols-2 gap-4">
         <div>
           <label className="label">Status</label>
-          <select className="input" value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value })}>
-            <option value="DRAFT">Draft</option>
-            <option value="PUBLISHED">Published</option>
-            <option value="ARCHIVED">Archived</option>
-          </select>
+          <Combobox
+            options={[
+              { value: "DRAFT", label: "Draft" },
+              { value: "PUBLISHED", label: "Published" },
+              { value: "ARCHIVED", label: "Archived" },
+            ]}
+            value={form.status}
+            onChange={(v) => setForm({ ...form, status: v })}
+            placeholder="Status"
+            clearable={false}
+          />
         </div>
         <div>
           <label className="label">Display order</label>
