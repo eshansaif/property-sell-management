@@ -49,7 +49,7 @@ export function SiteHeaderClient({ siteName, logoUrl, tree }: { siteName: string
         </Link>
 
         {/* Desktop navigation */}
-        <nav className="hidden flex-1 items-center gap-7 text-sm text-text-secondary md:flex" aria-label="Main">
+        <nav className="hidden flex-1 items-center gap-7 text-sm text-text-secondary md:flex items-center justify-center" aria-label="Main">
           {tree.length > 0 ? (
             <div
               className="relative"
