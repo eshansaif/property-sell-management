@@ -14,15 +14,18 @@ type Props = {
 export function TestimonialForm({ id, initial }: Props) {
   const router = useRouter();
   const toast = useToast();
-  const [form, setForm] = useState({
-    authorName: initial?.authorName ?? "",
-    authorRole: initial?.authorRole ?? "",
-    authorPhoto: initial?.authorPhoto ?? "",
-    content: initial?.content ?? "",
-    rating: initial?.rating ?? 5,
-    displayOrder: initial?.displayOrder ?? 0,
-    isActive: initial?.isActive ?? true,
-  });
+  const [form, setForm] = useState<{
+  authorName: string; authorRole: string; authorPhoto: string; content: string;
+  rating: number | null; displayOrder: number; isActive: boolean;
+}>({
+  authorName: initial?.authorName ?? "",
+  authorRole: initial?.authorRole ?? "",
+  authorPhoto: initial?.authorPhoto ?? "",
+  content: initial?.content ?? "",
+  rating: initial?.rating === undefined ? 5 : initial.rating,
+  displayOrder: initial?.displayOrder ?? 0,
+  isActive: initial?.isActive ?? true,
+});
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
