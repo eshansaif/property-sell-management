@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useToast } from "@/components/ui/Toast";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { safeFetch, readError } from "@/lib/safe-fetch";
+import { SingleImageUploader } from "@/components/admin/SingleImageUploader";
 import type { SiteSettings } from "@/lib/site-settings";
 
 export function SiteTab() {
@@ -47,6 +48,24 @@ export function SiteTab() {
       <div>
         <label className="label">Tagline</label>
         <textarea className="input" rows={2} maxLength={200} value={form.tagline} onChange={set("tagline")} placeholder="Shown in the footer and used as the default SEO description" />
+      </div>
+      <div>
+        <SingleImageUploader
+          label="Site logo"
+          helpText="Shown in the header and footer instead of the site name text. Leave empty to just show the name."
+          aspect="aspect-square"
+          value={form.logoUrl}
+          onChange={(url) => setForm({ ...form, logoUrl: url })}
+        />
+      </div>
+      <div>
+        <SingleImageUploader
+          label="Homepage hero image"
+          helpText="Shown beside the headline on the homepage. If left empty, a placeholder illustration is shown instead."
+          aspect="aspect-[4/3]"
+          value={form.heroImage}
+          onChange={(url) => setForm({ ...form, heroImage: url })}
+        />
       </div>
       <div className="grid gap-4 sm:grid-cols-2">
         <div><label className="label">Contact email</label><input type="email" className="input" value={form.contactEmail} onChange={set("contactEmail")} /></div>

@@ -12,6 +12,11 @@ const url = z.string().trim().max(300).refine((v) => v === "" || /^https?:\/\//i
 const schema = z.object({
   siteName: z.string().trim().min(2, "Site name is required").max(60),
   tagline: z.string().trim().max(200),
+  logoUrl: url,
+  heroImage: url,
+  aboutTitle: z.string().trim().min(1, "About title is required").max(100),
+  aboutContent: z.string().trim().max(8000),
+  aboutImage: url,
   contactEmail: z.string().trim().max(200).refine((v) => v === "" || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v), "Enter a valid contact email"),
   contactPhone: z.string().trim().max(30),
   whatsapp: z.string().trim().max(30),

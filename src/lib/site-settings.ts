@@ -4,6 +4,11 @@ import { prisma } from "@/lib/prisma";
 export type SiteSettings = {
   siteName: string;
   tagline: string;
+  logoUrl: string;
+  heroImage: string;
+  aboutTitle: string;
+  aboutContent: string;
+  aboutImage: string;
   contactEmail: string;
   contactPhone: string;
   whatsapp: string;
@@ -13,13 +18,18 @@ export type SiteSettings = {
 };
 
 export const SETTING_KEYS: (keyof SiteSettings)[] = [
-  "siteName", "tagline", "contactEmail", "contactPhone", "whatsapp", "address", "facebookUrl", "instagramUrl",
+  "siteName", "tagline", "logoUrl", "heroImage", "aboutTitle", "aboutContent", "aboutImage", "contactEmail", "contactPhone", "whatsapp", "address", "facebookUrl", "instagramUrl",
 ];
 
 export function defaultSettings(): SiteSettings {
   return {
     siteName: process.env.NEXT_PUBLIC_SITE_NAME || "Everest Listings",
     tagline: "A trusted place to discover properties and services, and reach the right people quickly.",
+    logoUrl: "",
+    heroImage: "",
+    aboutTitle: "About Us",
+    aboutContent: "",
+    aboutImage: "",
     contactEmail: "",
     contactPhone: "",
     whatsapp: "",

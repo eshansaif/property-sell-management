@@ -82,16 +82,29 @@ export async function GET(req: NextRequest) {
   const status = searchParams.get("status") || undefined;
   const page = Math.max(1, Number(searchParams.get("page") || 1));
   const pageSize = 20;
+  const q = searchParams.get("q")?.trim();
+  const where = {
+    ...(status ? { status: status as any } : {}),
+    ...(q
+      ? {
+          OR: [
+            { name: { contains: q, mode: "insensitive" as const } },
+            { phone: { contains: q } },
+            { email: { contains: q, mode: "insensitive" as const } },
+          ],
+        }
+      : {}),
+  };
 
   const [items, total] = await Promise.all([
     prisma.inquiry.findMany({
-      where: status ? { status: status as any } : undefined,
+      where,
       orderBy: { createdAt: "desc" },
       skip: (page - 1) * pageSize,
       take: pageSize,
       include: { listing: { select: { title: true } }, assignee: { select: { name: true } } },
     }),
-    prisma.inquiry.count({ where: status ? { status: status as any } : undefined }),
+    prisma.inquiry.count({ where }),
   ]);
 
   return NextResponse.json({ items, total, page, pageSize });

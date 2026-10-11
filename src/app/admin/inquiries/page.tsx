@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { StatusBadge } from "@/components/StatusBadge";
 import { TableSkeleton } from "@/components/ui/Skeleton";
 import { Pagination } from "@/components/ui/Pagination";
+import { useDebounced } from "@/components/ui/useDebounced";
 
 type Inquiry = {
   id: string; name: string; phone: string; status: string; createdAt: string;
@@ -23,12 +24,15 @@ export default function AdminInquiriesPage() {
   const [status, setStatus] = useState("");
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
+  const [q, setQ] = useState("");
+  const dq = useDebounced(q);
   const pageSize = 20;
 
-  const load = useCallback(async (s: string, p: number) => {
+  const load = useCallback(async (s: string, p: number, query: string) => {
     setItems(null);
     const params = new URLSearchParams();
     if (s) params.set("status", s);
+    if (query) params.set("q", query);
     params.set("page", String(p));
     const res = await safeFetch(`/api/inquiries?${params.toString()}`);
     if (!res.ok) {
@@ -39,9 +43,10 @@ export default function AdminInquiriesPage() {
     const data = await res.json();
     setItems(data.items);
     setTotal(data.total);
-  }, []);
+  }, [toast]);
 
-  useEffect(() => { load(status, page); }, [status, page, load]);
+  useEffect(() => { load(status, page, dq); }, [status, page, dq, load]);
+  useEffect(() => { setPage(1); }, [dq]);
 
   function onStatusChange(s: string) {
     setStatus(s);
@@ -52,6 +57,7 @@ export default function AdminInquiriesPage() {
     <div>
       <h1 className="mb-6 font-display text-2xl text-text-primary">Inquiries</h1>
 
+      <input className="input mb-3 max-w-xs" placeholder="Search name, phone or email..." value={q} onChange={(e) => setQ(e.target.value)} aria-label="Search inquiries" />
       <div className="mb-4 flex flex-wrap gap-2">
         {STATUSES.map((s) => (
           <button
@@ -80,7 +86,7 @@ export default function AdminInquiriesPage() {
             <tbody className="divide-y divide-border">
               {items === null && <TableSkeleton rows={6} cols={6} />}
               {items?.length === 0 && (
-                <tr><td colSpan={6} className="px-4 py-14 text-center text-text-secondary">No inquiries yet.</td></tr>
+                <tr><td colSpan={6} className="px-4 py-14 text-center text-text-secondary">{dq || status ? "No inquiries match your filters." : "No inquiries yet."}</td></tr>
               )}
               {items?.map((i) => (
                 <tr

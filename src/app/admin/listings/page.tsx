@@ -14,6 +14,7 @@ type Listing = {
   service: { name: string }; subService: { name: string };
 };
 type Service = { id: string; name: string };
+type Sub = { id: string; name: string };
 
 export default function AdminListingsPage() {
   const toast = useToast();
@@ -22,6 +23,8 @@ export default function AdminListingsPage() {
   const [q, setQ] = useState("");
   const [status, setStatus] = useState("");
   const [serviceId, setServiceId] = useState("");
+  const [subServiceId, setSubServiceId] = useState("");
+  const [subs, setSubs] = useState<Sub[]>([]);
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
   const pageSize = 20;
@@ -31,12 +34,19 @@ export default function AdminListingsPage() {
     fetch("/api/services").then((r) => r.json()).then(setServices);
   }, []);
 
-  const load = useCallback(async (query: string, s: string, svc: string, p: number) => {
+  useEffect(() => {
+    setSubServiceId("");
+    if (!serviceId) { setSubs([]); return; }
+    fetch(`/api/sub-services?serviceId=${serviceId}`).then((r) => r.json()).then((d) => setSubs(Array.isArray(d) ? d : [])).catch(() => setSubs([]));
+  }, [serviceId]);
+
+  const load = useCallback(async (query: string, s: string, svc: string, p: number, sub: string) => {
     setItems(null);
     const params = new URLSearchParams({ page: String(p) });
     if (query) params.set("q", query);
     if (s) params.set("status", s);
     if (svc) params.set("serviceId", svc);
+    if (sub) params.set("subServiceId", sub);
     const res = await safeFetch(`/api/listings?${params.toString()}`);
     if (!res.ok) {
       toast.error("Couldn't load listings", await readError(res));
@@ -48,12 +58,12 @@ export default function AdminListingsPage() {
     setTotal(data.total);
   }, []);
 
-  useEffect(() => { load(q, status, serviceId, page); }, [page, status, serviceId, load]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { load(q, status, serviceId, page, subServiceId); }, [page, status, serviceId, subServiceId, load]); // eslint-disable-line react-hooks/exhaustive-deps
 
   function onSearchChange(value: string) {
     setQ(value);
     clearTimeout(debounceRef.current);
-    debounceRef.current = setTimeout(() => { setPage(1); load(value, status, serviceId, 1); }, 350);
+    debounceRef.current = setTimeout(() => { setPage(1); load(value, status, serviceId, 1, subServiceId); }, 350);
   }
 
   async function handleArchive(id: string) {
@@ -66,7 +76,7 @@ export default function AdminListingsPage() {
     const result = await res.json().catch(() => ({}));
     if (result.archived) toast.info("Listing archived", "It is in use, so it was archived instead of deleted.");
     else toast.success("Listing archived");
-    load(q, status, serviceId, page);
+    load(q, status, serviceId, page, subServiceId);
   }
 
   return (
@@ -76,13 +86,20 @@ export default function AdminListingsPage() {
         <Link href="/admin/listings/new" className="btn-primary">New listing</Link>
       </div>
 
-      <div className="mb-4 grid gap-3 sm:grid-cols-3">
+      <div className="mb-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <input className="input" placeholder="Search by title..." value={q} onChange={(e) => onSearchChange(e.target.value)} />
         <Combobox
           options={services.map((s) => ({ value: s.id, label: s.name }))}
           value={serviceId}
           onChange={(v) => { setServiceId(v); setPage(1); }}
           placeholder="All services"
+        />
+        <Combobox
+          options={subs.map((s) => ({ value: s.id, label: s.name }))}
+          value={subServiceId}
+          onChange={(v) => { setSubServiceId(v); setPage(1); }}
+          placeholder={serviceId ? "All sub-services" : "Pick a service first"}
+          disabled={!serviceId}
         />
         <Combobox
           options={[

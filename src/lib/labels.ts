@@ -10,5 +10,6 @@ export const LABELS = {
   services: "Services",
   howItWorks: "How it works",
   contact: "Contact",
+  about: "About Us",
   sendInquiry: "Send Inquiry",
 } as const;

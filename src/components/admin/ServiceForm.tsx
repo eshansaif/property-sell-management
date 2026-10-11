@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Combobox } from "@/components/ui/Combobox";
+import { SingleImageUploader } from "@/components/admin/SingleImageUploader";
 import { useToast } from "@/components/ui/Toast";
 import { safeFetch, readError } from "@/lib/safe-fetch";
 
@@ -72,8 +73,13 @@ const msg = await readError(res);
         <textarea className="input" rows={4} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
       </div>
       <div>
-        <label className="label">Cover image URL</label>
-        <input className="input" value={form.coverImage} onChange={(e) => setForm({ ...form, coverImage: e.target.value })} placeholder="https://..." />
+        <SingleImageUploader
+          label="Cover image"
+          helpText="Shown on the service card on the homepage and services page. Recommended: a wide photo, roughly 4:3."
+          aspect="aspect-[4/3]"
+          value={form.coverImage}
+          onChange={(url) => setForm({ ...form, coverImage: url })}
+        />
       </div>
       <div className="grid grid-cols-2 gap-4">
         <div>

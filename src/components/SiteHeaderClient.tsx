@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import type { NavService } from "@/lib/nav-data";
 import { LABELS } from "@/lib/labels";
@@ -14,7 +15,7 @@ function Chevron({ open }: { open: boolean }) {
   );
 }
 
-export function SiteHeaderClient({ siteName, tree }: { siteName: string; tree: NavService[] }) {
+export function SiteHeaderClient({ siteName, logoUrl, tree }: { siteName: string; logoUrl?: string; tree: NavService[] }) {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [megaOpen, setMegaOpen] = useState(false);
@@ -38,10 +39,17 @@ export function SiteHeaderClient({ siteName, tree }: { siteName: string; tree: N
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-surface/90 backdrop-blur-md">
       <div className="container-page flex h-16 items-center justify-between gap-6">
-        <Link href="/" className="shrink-0 font-display text-xl tracking-tight text-text-primary">{siteName}</Link>
+        <Link href="/" className="flex shrink-0 items-center gap-2 font-display text-xl tracking-tight text-text-primary">
+          {logoUrl ? (
+            <span className="relative block h-9 w-9 overflow-hidden rounded-md">
+              <Image src={logoUrl} alt={siteName} fill className="object-contain" sizes="36px" />
+            </span>
+          ) : null}
+          {logoUrl ? <span className="hidden sm:inline">{siteName}</span> : siteName}
+        </Link>
 
         {/* Desktop navigation */}
-        <nav className="hidden flex-1 items-center justify-center gap-7 text-sm text-text-secondary md:flex" aria-label="Main">
+        <nav className="hidden flex-1 items-center gap-7 text-sm text-text-secondary md:flex" aria-label="Main">
           {tree.length > 0 ? (
             <div
               className="relative"
@@ -118,6 +126,7 @@ export function SiteHeaderClient({ siteName, tree }: { siteName: string; tree: N
           )}
           <Link href="/listings" className={linkClass("/listings")}>{LABELS.allListings}</Link>
           <Link href="/#how-it-works" className="transition-colors hover:text-text-primary">{LABELS.howItWorks}</Link>
+          <Link href="/about" className={linkClass("/about")}>{LABELS.about}</Link>
           <Link href="/#contact" className="transition-colors hover:text-text-primary">{LABELS.contact}</Link>
         </nav>
 
@@ -175,6 +184,7 @@ export function SiteHeaderClient({ siteName, tree }: { siteName: string; tree: N
 
             <div className="my-2 h-px bg-border" />
             <Link href="/#how-it-works" className="rounded-md px-3 py-2.5 text-sm text-text-primary hover:bg-surface-muted">{LABELS.howItWorks}</Link>
+            <Link href="/about" className="rounded-md px-3 py-2.5 text-sm text-text-primary hover:bg-surface-muted">{LABELS.about}</Link>
             <Link href="/#contact" className="rounded-md px-3 py-2.5 text-sm text-text-primary hover:bg-surface-muted">{LABELS.contact}</Link>
             <Link href="/#contact" className="btn-accent mt-3">{LABELS.sendInquiry}</Link>
           </nav>

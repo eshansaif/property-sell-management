@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Combobox } from "@/components/ui/Combobox";
+import { SingleImageUploader } from "@/components/admin/SingleImageUploader";
 import { useToast } from "@/components/ui/Toast";
 import { safeFetch, readError } from "@/lib/safe-fetch";
 
@@ -13,7 +14,7 @@ export function SubServiceForm({
   initial,
 }: {
   subServiceId?: string;
-  initial?: Partial<{ name: string; serviceId: string; shortDesc: string; description: string; status: string; isFeatured: boolean; displayOrder: number }>;
+  initial?: Partial<{ name: string; serviceId: string; shortDesc: string; description: string; coverImage: string; status: string; isFeatured: boolean; displayOrder: number }>;
 }) {
   const router = useRouter();
   const toast = useToast();
@@ -23,6 +24,7 @@ export function SubServiceForm({
     serviceId: initial?.serviceId ?? "",
     shortDesc: initial?.shortDesc ?? "",
     description: initial?.description ?? "",
+    coverImage: initial?.coverImage ?? "",
     status: initial?.status ?? "DRAFT",
     isFeatured: initial?.isFeatured ?? false,
     displayOrder: initial?.displayOrder ?? 0,
@@ -82,6 +84,15 @@ const msg = await readError(res);
       <div>
         <label className="label">Description</label>
         <textarea className="input" rows={3} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
+      </div>
+      <div>
+        <SingleImageUploader
+          label="Cover image"
+          helpText="Shown wherever this category is listed. Recommended: a wide photo, roughly 4:3."
+          aspect="aspect-[4/3]"
+          value={form.coverImage}
+          onChange={(url) => setForm({ ...form, coverImage: url })}
+        />
       </div>
       <div className="grid grid-cols-2 gap-4">
         <div>

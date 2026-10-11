@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { prisma } from "@/lib/prisma";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
@@ -6,7 +7,13 @@ import { ServiceCard } from "@/components/ServiceCard";
 import { ListingCard } from "@/components/ListingCard";
 import { InquiryForm } from "@/components/InquiryForm";
 import { SearchBar } from "@/components/public/SearchBar";
+import { ClientMarquee } from "@/components/public/ClientMarquee";
 import { getSiteSettings } from "@/lib/site-settings";
+import { getActiveClientsSafe } from "@/lib/clients-data";
+import { PromoBanner } from "@/components/public/PromoBanner";
+import { TestimonialsSection } from "@/components/public/TestimonialsSection";
+import { getActivePromoItemsSafe } from "@/lib/promo-data";
+import { getActiveTestimonialsSafe } from "@/lib/testimonials-data";
 import { LABELS } from "@/lib/labels";
 
 export const revalidate = 60;
@@ -23,7 +30,7 @@ export default async function HomePage() {
     url: siteUrl,
   };
 
-  const [services, featuredListings] = await Promise.all([
+  const [services, featuredListings, clients, promoItems, testimonials, listingCount, convertedCount] = await Promise.all([
     prisma.service.findMany({
       where: { status: "PUBLISHED" },
       orderBy: { displayOrder: "asc" },
@@ -36,11 +43,20 @@ export default async function HomePage() {
       include: { images: { where: { isCover: true }, take: 1 }, service: true, subService: true },
       take: 6,
     }),
+    getActiveClientsSafe(),
+    getActivePromoItemsSafe(),
+    getActiveTestimonialsSafe(),
+    prisma.listing.count({ where: { status: "PUBLISHED" } }),
+    prisma.inquiry.count({ where: { status: "CONVERTED" } }),
   ]);
+
+  // Only show the stats row once there's something real to show — three zeros looks broken, not "standard".
+  const showStats = listingCount > 0 || services.length > 0;
 
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationLd) }} />
+      <PromoBanner items={promoItems} />
       <SiteHeader />
       <main>
         {/* Hero */}
@@ -73,29 +89,69 @@ export default async function HomePage() {
                 <Link href="/services" className="btn-primary">Browse services</Link>
                 <Link href="#contact" className="btn-outline">Send an inquiry</Link>
               </div>
+
+              {/* Stats — real counts, not placeholder numbers */}
+              {showStats && (
+                <dl className="mt-10 grid max-w-md grid-cols-3 gap-4 border-t border-border pt-6">
+                  <div>
+                    <dt className="sr-only">Active listings</dt>
+                    <dd className="font-display text-2xl text-text-primary">{listingCount}+</dd>
+                    <p className="text-xs text-text-secondary">Active listings</p>
+                  </div>
+                  <div>
+                    <dt className="sr-only">Services</dt>
+                    <dd className="font-display text-2xl text-text-primary">{services.length}+</dd>
+                    <p className="text-xs text-text-secondary">Services offered</p>
+                  </div>
+                  <div>
+                    <dt className="sr-only">Successful deals</dt>
+                    <dd className="font-display text-2xl text-text-primary">{convertedCount}+</dd>
+                    <p className="text-xs text-text-secondary">Successful deals</p>
+                  </div>
+                </dl>
+              )}
             </div>
+
+            {/* Hero visual — admin-uploaded image (Settings → Site settings) when set,
+                otherwise a lightweight illustrative placeholder so the page never looks broken. */}
             <div className="relative hidden md:block">
-              <div className="relative ml-auto aspect-[4/3] w-full max-w-md">
-                <div className="absolute inset-0 translate-x-4 translate-y-4 rounded-2xl bg-primary/[0.06]" />
-                <div className="card relative flex h-full w-full flex-col justify-between overflow-hidden p-6">
-                  <div className="flex items-center justify-between">
-                    <div className="h-2.5 w-24 rounded-full bg-surface-muted" />
-                    <div className="h-6 w-6 rounded-full bg-accent/20" />
-                  </div>
-                  <div className="space-y-3">
-                    <div className="h-24 w-full rounded-lg bg-surface-muted" />
-                    <div className="h-3 w-3/4 rounded-full bg-surface-muted" />
-                    <div className="h-3 w-1/2 rounded-full bg-surface-muted" />
-                  </div>
-                  <div className="flex items-center justify-between border-t border-border pt-4">
-                    <div className="h-3 w-16 rounded-full bg-accent/20" />
-                    <div className="rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground">Send Inquiry</div>
+              {settings.heroImage ? (
+                <div className="relative ml-auto aspect-[4/3] w-full max-w-md overflow-hidden rounded-2xl shadow-card">
+                  <Image
+                    src={settings.heroImage}
+                    alt={`${siteName} — featured properties and services`}
+                    fill
+                    priority
+                    className="object-cover"
+                    sizes="(max-width: 768px) 0px, 448px"
+                  />
+                </div>
+              ) : (
+                <div className="relative ml-auto aspect-[4/3] w-full max-w-md">
+                  <div className="absolute inset-0 translate-x-4 translate-y-4 rounded-2xl bg-primary/[0.06]" />
+                  <div className="card relative flex h-full w-full flex-col justify-between overflow-hidden p-6">
+                    <div className="flex items-center justify-between">
+                      <div className="h-2.5 w-24 rounded-full bg-surface-muted" />
+                      <div className="h-6 w-6 rounded-full bg-accent/20" />
+                    </div>
+                    <div className="space-y-3">
+                      <div className="h-24 w-full rounded-lg bg-surface-muted" />
+                      <div className="h-3 w-3/4 rounded-full bg-surface-muted" />
+                      <div className="h-3 w-1/2 rounded-full bg-surface-muted" />
+                    </div>
+                    <div className="flex items-center justify-between border-t border-border pt-4">
+                      <div className="h-3 w-16 rounded-full bg-accent/20" />
+                      <div className="rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground">Send Inquiry</div>
+                    </div>
                   </div>
                 </div>
-              </div>
+              )}
             </div>
           </div>
         </section>
+
+        {/* Trusted by — client logo marquee (managed from Admin → Clients) */}
+        <ClientMarquee clients={clients} />
 
         {/* Services */}
         <section className="container-page py-16">
@@ -168,6 +224,8 @@ export default async function HomePage() {
             ))}
           </div>
         </section>
+
+        <TestimonialsSection items={testimonials} />
 
         {/* Why choose us */}
         <section className="container-page py-16">

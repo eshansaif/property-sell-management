@@ -16,6 +16,7 @@ export default async function EditSubServicePage({ params }: { params: { id: str
           serviceId: sub.serviceId,
           shortDesc: sub.shortDesc ?? "",
           description: sub.description ?? "",
+          coverImage: sub.coverImage ?? "",
           status: sub.status,
           isFeatured: sub.isFeatured,
           displayOrder: sub.displayOrder,

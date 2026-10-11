@@ -195,6 +195,7 @@ model Listing {
   specs         ListingSpecificationValue[]
   customSpecs   ListingCustomSpec[]
   inquiries     Inquiry[]
+  promoItems    PromoItem[]
 
   @@index([serviceId, subServiceId, status])
   @@index([status, isFeatured, publishedAt])
@@ -294,6 +295,52 @@ model InquiryActivity {
 model SystemSetting {
   key   String @id
   value String
+}
+
+// Logos shown in the "Trusted by" marquee on the homepage.
+model Client {
+  id           String   @id @default(cuid())
+  name         String
+  logoUrl      String
+  websiteUrl   String?
+  displayOrder Int      @default(0)
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([isActive, displayOrder])
+}
+
+model Testimonial {
+  id           String   @id @default(cuid())
+  authorName   String
+  authorRole   String?
+  authorPhoto  String?
+  content      String
+  rating       Int?
+  displayOrder Int      @default(0)
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([isActive, displayOrder])
+}
+
+// Items in the scrolling promo banner at the very top of the homepage.
+// Either points at a listing (link built automatically) or a custom URL.
+model PromoItem {
+  id           String   @id @default(cuid())
+  label        String?
+  badge        String?
+  listingId    String?
+  listing      Listing? @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  customUrl    String?
+  displayOrder Int      @default(0)
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([isActive, displayOrder])
 }
 
 model AuditLog {

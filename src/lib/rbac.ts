@@ -11,6 +11,9 @@ const PERMISSIONS: Record<RoleName, string[]> = {
     "inquiry:read", "inquiry:write",
     "user:read", "user:write",
     "settings:read", "settings:write",
+    "client:read", "client:write",
+    "testimonial:read", "testimonial:write",
+    "promo:read", "promo:write",
   ],
   STAFF: ["listing:read", "inquiry:read", "inquiry:write"],
 };

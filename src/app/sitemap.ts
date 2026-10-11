@@ -16,6 +16,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: siteUrl, lastModified: new Date() },
     { url: `${siteUrl}/services`, lastModified: new Date() },
     { url: `${siteUrl}/listings`, lastModified: new Date() },
+    { url: `${siteUrl}/about`, lastModified: new Date() },
     ...services.map((s) => ({ url: `${siteUrl}/services/${s.slug}`, lastModified: s.updatedAt })),
     ...subServices.map((s) => ({ url: `${siteUrl}/services/${s.service.slug}/${s.slug}`, lastModified: s.updatedAt })),
     ...listings.map((l) => ({ url: `${siteUrl}/services/${l.service.slug}/${l.subService.slug}/${l.slug}`, lastModified: l.updatedAt })),

@@ -8,6 +8,7 @@ import { ProfileTab } from "@/components/admin/settings/ProfileTab";
 import { PasswordTab } from "@/components/admin/settings/PasswordTab";
 import { TeamTab } from "@/components/admin/settings/TeamTab";
 import { SiteTab } from "@/components/admin/settings/SiteTab";
+import { AboutTab } from "@/components/admin/settings/AboutTab";
 
 export default function SettingsPage() {
   const { data: session, status } = useSession();
@@ -21,6 +22,7 @@ export default function SettingsPage() {
     { id: "password", label: "Password", show: true },
     { id: "team", label: "Team", show: can(role, "user:read") },
     { id: "site", label: "Site settings", show: can(role, "settings:read") },
+    { id: "about", label: "About page", show: can(role, "settings:read") },
   ].filter((t) => t.show);
 
   return (
@@ -49,6 +51,7 @@ export default function SettingsPage() {
         {tab === "password" && <PasswordTab />}
         {tab === "team" && <TeamTab />}
         {tab === "site" && <SiteTab />}
+        {tab === "about" && <AboutTab />}
       </div>
     </div>
   );

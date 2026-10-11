@@ -16,6 +16,10 @@ const NAV = [
   { href: "/admin/services", label: "Services", icon: "layers", perm: "service:read" },
   { href: "/admin/sub-services", label: "Sub-services", icon: "folder", perm: "subservice:read" },
   { href: "/admin/specifications", label: "Specifications", icon: "sliders", perm: "listing:read" },
+  { href: "/admin/clients", label: "Clients", icon: "users", perm: "client:read" },
+  { href: "/admin/testimonials", label: "Testimonials", icon: "quote", perm: "testimonial:read" },
+  { href: "/admin/promo", label: "Promo Banner", icon: "megaphone", perm: "promo:read" },
+  { href: "/admin/audit-logs", label: "Audit Log", icon: "shield", perm: "audit:read" },
   { href: "/admin/settings", label: "Settings", icon: "settings", perm: null },
 ];
 
@@ -127,6 +131,10 @@ function NavIcon({ name }: { name: string }) {
     list: "M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01",
     sliders: "M4 21v-7m0-4V3m8 18v-9m0-4V3m8 18v-5m0-4V3M1 14h6m2-6h6m2 8h6",
     inbox: "M22 12h-6l-2 3h-4l-2-3H2M5 12l2-8h10l2 8v6a2 2 0 01-2 2H7a2 2 0 01-2-2v-6z",
+    users: "M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2M9 11a4 4 0 100-8 4 4 0 000 8zM23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75",
+    quote: "M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z",
+    megaphone: "M3 11v2a1 1 0 001 1h2l5 4V6L6 10H4a1 1 0 00-1 1zM15 9a4 4 0 010 6M18 6a8 8 0 010 12",
+    shield: "M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6l8-3z",
     settings: "M12 15a3 3 0 100-6 3 3 0 000 6zM19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 11-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 110-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 114 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 110 4h-.09a1.65 1.65 0 00-1.51 1z",
   };
   return (

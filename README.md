@@ -170,6 +170,9 @@ Every action gives feedback: saves, deletes/archives, uploads, status changes, a
 
 `public/manual.html` (served at `/manual.html`, linked as **Help** in the admin header) is a printable Bangla guide covering every screen, the two ways to add specifications, roles, and troubleshooting. Use the browser's Print → Save as PDF to share it.
 
+## 13b. Content modules (Clients, Testimonials, Promo Banner, About, Audit Log)
+All are admin-managed, cached with tags and refreshed through `refreshPublicSite()`. After pulling this version run `npx prisma db push` (new tables: Client, Testimonial, PromoItem). Admin lists have search + filters + pagination. Audit Log is Super Admin only (`audit:read`).
+
 ## 14. Default login (after seeding)
 
 Set in `.env` before seeding — do not use the example defaults in production.

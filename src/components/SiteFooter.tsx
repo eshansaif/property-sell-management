@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { getSiteSettings } from "@/lib/site-settings";
 import { getNavTreeSafe } from "@/lib/nav-data";
 import { LABELS } from "@/lib/labels";
@@ -11,7 +12,14 @@ export async function SiteFooter() {
     <footer className="border-t border-border bg-surface-muted">
       <div className="container-page grid gap-10 py-14 sm:grid-cols-2 lg:grid-cols-4">
         <div>
-          <p className="font-display text-lg text-text-primary">{s.siteName}</p>
+          <div className="flex items-center gap-2">
+            {s.logoUrl && (
+              <span className="relative block h-8 w-8 overflow-hidden rounded-md">
+                <Image src={s.logoUrl} alt={s.siteName} fill className="object-contain" sizes="32px" />
+              </span>
+            )}
+            <p className="font-display text-lg text-text-primary">{s.siteName}</p>
+          </div>
           {s.tagline && <p className="mt-3 max-w-xs text-sm text-text-secondary">{s.tagline}</p>}
           {(s.facebookUrl || s.instagramUrl) && (
             <div className="mt-4 flex gap-4 text-sm">
@@ -35,6 +43,7 @@ export async function SiteFooter() {
             <li><Link href="/listings" className="hover:text-text-primary">{LABELS.allListings}</Link></li>
             <li><Link href="/services" className="hover:text-text-primary">All services</Link></li>
             <li><Link href="/#how-it-works" className="hover:text-text-primary">{LABELS.howItWorks}</Link></li>
+            <li><Link href="/about" className="hover:text-text-primary">{LABELS.about}</Link></li>
             <li><Link href="/#contact" className="hover:text-text-primary">{LABELS.sendInquiry}</Link></li>
           </ul>
         </div>

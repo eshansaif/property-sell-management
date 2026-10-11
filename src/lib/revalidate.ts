@@ -4,5 +4,8 @@ import { revalidatePath, revalidateTag } from "next/cache";
 export function refreshPublicSite() {
   revalidateTag("nav-tree");
   revalidateTag("site-settings");
+  revalidateTag("clients");
+  revalidateTag("testimonials");
+  revalidateTag("promo");
   revalidatePath("/", "layout");
 }
